@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="ar" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS — Game Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* New Lighter & Calmer Palette */
+    --primary: #007bff;      /* A calm, standard blue */
+    --secondary: #6c757d;    /* A standard gray for muted text */
+    --success: #28a745;      /* Green for success/free */
+    --danger: #dc3545;       /* Red for errors */
+    --bg: #f8f9fa;          /* Light gray background */
+    --card: #ffffff;         /* White card background */
+    --border: #dee2e6;       /* Standard light gray border */
+    --text: #212529;         /* Dark text for readability */
+    --muted: #6c757d;        /* Muted text color */
+    --gold: #ffc107;         /* A softer gold for ratings */
+
+    /* Mapped old variables for compatibility */
+    --neon: var(--primary);
+    --neon2: var(--danger);
+    --neon3: var(--secondary);
+  }
+ 
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+ 
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+ 
+  /* Animated background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: /* Softer grid */
+      linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+ 
+  /* Header */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255,255,255,0.85); /* Lighter background */
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid #e9ecef;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 72px;
+  }
+ 
+  .logo {
+    font-family: 'Orbitron', monospace;
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    color: var(--text); /* Changed from neon */
+    position: relative;
+  }
+ 
+  .logo span {
+    color: var(--primary); /* Changed from neon2 */
+  }
+ 
+  .logo-sub {
+    font-size: 9px;
+    letter-spacing: 8px;
+    color: var(--muted);
+    font-family: 'Inter', sans-serif;
+    display: block;
+    margin-top: -2px;
+  }
+ 
+  nav {
+    display: flex;
+    gap: 8px;
+  }
+ 
+  nav button {
+    background: transparent;
+    border: 1px solid transparent; /* Cleaner look */
+    color: var(--muted);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    padding: 8px 20px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.3s;
+    border-radius: 6px;
+  }
+ 
+  nav button:hover, nav button.active {
+    background: rgba(0,123,255,0.1);
+    color: var(--primary);
+  }
+ 
+  .cart-btn {
+    position: relative;
+    background: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: var(--text) !important;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: white !important;
+  }
+ 
+  .cart-count {
+    background: var(--neon2);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', sans-serif;
+  }
+ 
+  /* Hero */
+  .hero {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 80px 40px 60px;
+    overflow: hidden;
+  }
+ 
+  .hero-tag {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 5px;
+    color: var(--primary);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    font-family: 'Inter', sans-serif;
+    background: rgba(0,123,255,0.1);
+    border: 1px solid rgba(0,123,255,0.2);
+    padding: 4px 16px;
+    border-radius: 4px;
+  }
+ 
+  .hero h1 {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(36px, 6vw, 72px);
+    font-weight: 900;
+    line-height: 1;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+ 
+  .hero p {
+    font-size: 18px;
+    color: var(--muted);
+    font-weight: 300;
+    letter-spacing: 1px;
+  }
+ 
+  /* Filter bar */
+  .filter-bar {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 24px 40px;
+    flex-wrap: wrap;
+  }
+ 
+  .search-wrap {
+    flex: 1;
+    min-width: 240px;
+    position: relative;
+  }
+ 
+  .search-wrap input {
+    width: 100%;
+    background: var(--white);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px;
+    letter-spacing: 1px;
+    padding: 12px 16px 12px 44px;
+    outline: none;
+    transition: all 0.3s;
+    border-radius: 6px;
+  }
+ 
+  .search-wrap input:focus { border-color: var(--neon); }
+  .search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 16px;
+  }
+ 
+  .filter-btns {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+ 
+  .filter-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    padding: 10px 18px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.3s;
+    border-radius: 6px;
+  }
+ 
+  .filter-btn:hover, .filter-btn.active {
+    background: rgba(0,123,255,0.1);
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+ 
+  .sort-select {
+    background: white;
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    letter-spacing: 1px;
+    padding: 10px 16px;
+    cursor: pointer;
+    outline: none;
+    text-transform: uppercase;
+    border-radius: 6px;
+  }
+ 
+  /* Games grid */
+  .games-section {
+    position: relative;
+    z-index: 1;
+    padding: 20px 40px 60px;
+  }
+ 
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+ 
+  .section-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+ 
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+ 
+  .game-count {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 1px;
+  }
+ 
+  .games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+ 
+  /* Game Card */
+  .game-card {
+    background: white;
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    border-radius: 8px;
+    animation: fadeInUp 0.5s ease forwards;
+    opacity: 0;
+  }
+ 
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+ 
+  .game-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+  }
+ 
+  .game-thumb {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    display: block;
+    border-bottom: 1px solid var(--border);
+  }
+ 
+  .game-card:hover .game-thumb {
+    filter: saturate(1.1);
+  }
+ 
+  .thumb-placeholder {
+    width: 100%;
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    position: relative;
+    background: #f0f2f5;
+    overflow: hidden;
+  }
+ 
+  .card-body {
+    padding: 16px;
+  }
+ 
+  .card-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+ 
+  .genre-tag {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    border-radius: 4px;
+  }
+ 
+  .rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--gold);
+    font-family: 'Inter', sans-serif;
+  }
+ 
+  .card-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+    letter-spacing: 1px;
+    line-height: 1.3;
+  }
+ 
+  .card-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+    margin-bottom: 14px;
+    font-weight: 300;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+ 
+  .card-specs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+ 
+  .spec {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.5px;
+  }
+ 
+  .spec-icon { font-size: 12px; }
+ 
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+ 
+  .price-wrap { }
+ 
+  .price-label {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-family: 'Inter', sans-serif;
+  }
+ 
+  .price {
+    font-family: 'Orbitron', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+  }
+ 
+  .price .currency { font-size: 12px; vertical-align: super; }
+ 
+  .price-free {
+    font-family: 'Orbitron', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--success);
+  }
+ 
+  .buy-btn {
+    background: rgba(0,123,255,0.1);
+    border: 1px solid transparent;
+    color: var(--neon);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    padding: 10px 20px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.3s;
+    border-radius: 6px;
+  }
+ 
+  .buy-btn:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+  }
+ 
+  .buy-btn span { position: relative; z-index: 1; }
+ 
+  .buy-btn.loading {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+ 
+  /* Loading state */
+  .loading-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    transition: opacity 0.5s;
+  }
+ 
+  .loading-screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+ 
+  .loader-logo {
+    font-family: 'Orbitron', monospace;
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--primary);
+    margin-bottom: 32px;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+ 
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+ 
+  .loader-bar {
+    width: 200px;
+    height: 2px;
+    background: rgba(0,123,255,0.1);
+    position: relative;
+    overflow: hidden;
+  }
+ 
+  .loader-bar::after {
+    content: '';
+    position: absolute;
+    left: -100%;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, var(--primary), transparent);
+    animation: scan 1.2s linear infinite;
+  }
+ 
+  @keyframes scan {
+    to { left: 200%; }
+  }
+ 
+  .loader-text {
+    margin-top: 16px;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--muted);
+    font-family: 'Inter', sans-serif;
+    text-transform: uppercase;
+  }
+ 
+  /* Cart panel */
+  .cart-panel {
+    position: fixed;
+    top: 0; right: 0;
+    width: 380px;
+    height: 100vh;
+    background: rgba(255,255,255,0.95);
+    border-left: 1px solid #e9ecef;
+    backdrop-filter: blur(10px);
+    z-index: 500;
+    transform: translateX(100%);
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    display: flex;
+    flex-direction: column;
+  }
+ 
+  .cart-panel.open { transform: translateX(0); }
+ 
+  .cart-header {
+    padding: 24px;
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+ 
+  .cart-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 14px;
+    letter-spacing: 3px;
+    color: var(--text);
+  }
+ 
+  .close-cart {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    border-radius: 50%;
+  }
+ 
+  .close-cart:hover { border-color: var(--danger); color: var(--danger); background: rgba(220,53,69,0.1); }
+ 
+  .cart-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 24px;
+  }
+ 
+  .cart-item {
+    display: flex;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid #f1f3f5;
+    animation: fadeInUp 0.3s ease;
+  }
+ 
+  .cart-item-img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+ 
+  .cart-item-img-placeholder {
+    width: 60px;
+    height: 60px;
+    background: #f8f9fa;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+  }
+ 
+  .cart-item-info { flex: 1; }
+ 
+  .cart-item-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+ 
+  .cart-item-price {
+    font-size: 14px;
+    color: var(--primary);
+    font-family: 'Orbitron', monospace;
+  }
+ 
+  .cart-item-qty {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+  }
+ 
+  .qty-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+ 
+  .qty-btn:hover { border-color: var(--neon); color: var(--neon); }
+ 
+  .qty-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    min-width: 20px;
+    text-align: center;
+  }
+ 
+  .remove-item {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px;
+    transition: color 0.3s;
+    align-self: flex-start;
+  }
+ 
+  .remove-item:hover { color: var(--neon2); }
+ 
+  .cart-empty {
+    text-align: center;
+    padding: 60px 0;
+    color: var(--muted);
+  }
+ 
+  .cart-empty-icon { font-size: 48px; margin-bottom: 16px; }
+ 
+  .cart-empty p {
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-family: 'Inter', sans-serif;
+  }
+ 
+  .cart-footer {
+    padding: 24px;
+    border-top: 1px solid #e9ecef;
+  }
+ 
+  .cart-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+ 
+  .total-label {
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+    font-family: 'Inter', sans-serif;
+  }
+ 
+  .total-price {
+    font-family: 'Orbitron', monospace;
+    font-size: 24px;
+    color: var(--text);
+  }
+ 
+  .checkout-btn {
+    width: 100%;
+    background: var(--primary);
+    border: 1px solid var(--primary);
+    color: white;
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    padding: 16px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.3s;
+    border-radius: 6px;
+  }
+ 
+  .checkout-btn:hover {
+    opacity: 0.85;
+  }
+ 
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--text);
+    color: white;
+    border-left: 5px solid var(--success);
+    padding: 14px 20px;
+    min-width: 260px;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.25,0.46,0.45,0.94);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    border-radius: 6px;
+  }
+ 
+  .toast.show {
+    transform: translateY(0);
+    opacity: 1;
+  }
+ 
+  .toast.error {
+    border-left-color: var(--danger);
+  }
+ 
+  .toast-icon { font-size: 18px; color: white; }
+  .toast-msg { font-size: 13px; letter-spacing: 1px; font-family: 'Inter', sans-serif; color: white; }
+
+  /* Modal (Track Order) */
+  .modal {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+    z-index: 600; display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s;
+  }
+  .modal.show { opacity: 1; pointer-events: all; }
+  .modal-content {
+    background: white; border: 1px solid var(--border); border-radius: 8px;
+    width: 90%; max-width: 450px; overflow: hidden; transform: translateY(20px);
+    transition: transform 0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  }
+  .modal.show .modal-content { transform: translateY(0); }
+  .modal-header { padding: 20px; border-bottom: 1px solid #e9ecef; display: flex; justify-content: space-between; align-items: center; }
+  .modal-header h3 { font-family: 'Orbitron', monospace; font-size: 16px; letter-spacing: 2px; color: var(--text); }
+  .modal-header button { background: transparent; border: none; cursor: pointer; font-size: 18px; color: var(--muted); transition: color 0.3s; }
+  .modal-header button:hover { color: var(--danger); }
+  .modal-body { padding: 24px; max-height: 70vh; overflow-y: auto; }
+  .order-item-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f1f3f5; font-size: 14px; font-weight: 500; }
+  .order-item-row:last-child { border-bottom: none; }
+  .order-summary { margin-top: 20px; padding-top: 20px; border-top: 2px dashed #e9ecef; display: flex; justify-content: space-between; font-weight: 700; font-size: 18px; font-family: 'Orbitron', monospace; }
+ 
+  /* Genre colors */
+  .genre-action  { background: #ffebee; color: #c62828; }
+  .genre-rpg     { background: #e8eaf6; color: #3949ab; }
+  .genre-strategy{ background: #e0f7fa; color: #00838f; }
+  .genre-sports  { background: #e8f5e9; color: #2e7d32; }
+  .genre-default { background: #f1f3f5; color: var(--muted); }
+ 
+  /* Thumb gradients */
+  .thumb-action   { background: #ffebee; color: #ef9a9a; }
+  .thumb-rpg      { background: #e8eaf6; color: #9fa8da; }
+  .thumb-strategy { background: #e0f7fa; color: #80deea; }
+  .thumb-sports   { background: #e8f5e9; color: #a5d6a7; }
+  .thumb-default  { background: #f1f3f5; color: #ced4da; }
+ 
+  /* Error state */
+  .error-state {
+    text-align: center;
+    padding: 80px 40px;
+    position: relative;
+    z-index: 1;
+  }
+ 
+  .error-state h2 {
+    font-family: 'Orbitron', monospace;
+    font-size: 20px;
+    color: var(--danger);
+    margin-bottom: 12px;
+    letter-spacing: 3px;
+  }
+ 
+  .error-state p {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+ 
+  .retry-btn {
+    margin-top: 24px;
+    background: transparent;
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    letter-spacing: 3px;
+    padding: 12px 28px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.3s;
+    border-radius: 6px;
+  }
+ 
+  .retry-btn:hover {
+    background: rgba(255,0,110,0.1);
+  }
+ 
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 400;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s;
+  }
+ 
+  .overlay.show {
+    opacity: 1;
+    pointer-events: all;
+  }
+ 
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #ced4da; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #adb5bd; }
+</style>
+</head>
+<body>
+ 
+<!-- Loading Screen -->
+<div class="loading-screen" id="loader">
+  <div class="loader-logo">NEXUS</div>
+  <div class="loader-bar"></div>
+  <div class="loader-text">Initializing Store</div>
+</div>
+ 
+<!-- Overlay -->
+<div class="overlay" id="overlay" onclick="closeCart()"></div>
+ 
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toast-icon"></span>
+  <span class="toast-msg" id="toast-msg"></span>
+</div>
+ 
+<!-- Header -->
+<header>
+  <div>
+    <div class="logo">NEX<span>US</span></div>
+    <span class="logo-sub">DIGITAL GAME STORE</span>
+  </div>
+  <nav>
+    <button class="active" onclick="filterByGenre('all', this)">All Games</button>
+    <button onclick="filterByGenre('action', this)">Action</button>
+    <button onclick="filterByGenre('rpg', this)">RPG</button>
+    <button onclick="filterByGenre('strategy', this)">Strategy</button>
+    <button onclick="openMyOrdersModal()">My Orders</button>
+    <button class="cart-btn" onclick="toggleCart()">
+      Cart
+      <div class="cart-count" id="cart-count">0</div>
+    </button>
+  </nav>
+</header>
+ 
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-tag">▶ NEW RELEASES AVAILABLE</div>
+  <h1>LEVEL UP<br>YOUR LIBRARY</h1>
+  <p>Thousands of titles. Instant delivery. Zero limits.</p>
+</div>
+ 
+<!-- Filter Bar -->
+<div class="filter-bar">
+  <div class="search-wrap">
+    <span class="search-icon">⌕</span>
+    <input type="text" id="search-input" placeholder="SEARCH GAMES..." oninput="handleSearch()" />
+  </div>
+  <div class="filter-btns">
+    <button class="filter-btn active" onclick="sortGames('default', this)">Default</button>
+    <button class="filter-btn" onclick="sortGames('price-asc', this)">Price ↑</button>
+    <button class="filter-btn" onclick="sortGames('price-desc', this)">Price ↓</button>
+    <button class="filter-btn" onclick="sortGames('rating', this)">Top Rated</button>
+  </div>
+</div>
+ 
+<!-- Games Section -->
+<div class="games-section">
+  <div class="section-header">
+    <div class="section-title">Available Games</div>
+    <div class="section-line"></div>
+    <div class="game-count" id="game-count">Loading...</div>
+  </div>
+  <div class="games-grid" id="games-grid"></div>
+</div>
+ 
+<!-- Cart Panel -->
+<div class="cart-panel" id="cart-panel">
+  <div class="cart-header">
+    <div class="cart-title">// CART</div>
+    <button class="close-cart" onclick="closeCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cart-items"></div>
+  <div class="cart-footer">
+    <div class="cart-total">
+      <div class="total-label">Total</div>
+      <div class="total-price" id="cart-total">$0.00</div>
+    </div>
+    <button class="checkout-btn" onclick="handleCheckout()">PROCEED TO CHECKOUT</button>
+  </div>
+</div>
+
+<!-- My Orders Modal -->
+<div class="modal" id="my-orders-modal">
+  <div class="modal-content" style="max-width: 550px;">
+    <div class="modal-header">
+      <h3>// ALL ORDERS</h3>
+      <button onclick="closeMyOrdersModal()">✕</button>
+    </div>
+    <div class="modal-body" id="my-orders-content" style="background: #f8f9fa;">
+      <!-- Orders will load here -->
+    </div>
+  </div>
+</div>
+
+<script>
+const API_BASE = 'http://127.0.0.1:5000';
+ const GAME_IMAGES = {
+  1: "https://cdn.cloudflare.steamstatic.com/steam/apps/2195250/header.jpg", // FIFA 24
+  2: "https://cdn.cloudflare.steamstatic.com/steam/apps/1938090/header.jpg", // COD MW3
+  3: "https://cdn.cloudflare.steamstatic.com/steam/apps/292030/header.jpg", // Witcher 3
+  4: "https://cdn.cloudflare.steamstatic.com/steam/apps/271590/header.jpg", // GTA V
+  5: "https://cdn.cloudflare.steamstatic.com/steam/apps/1174180/header.jpg", // RDR2
+  6: "https://cdn.cloudflare.steamstatic.com/steam/apps/1551360/header.jpg", // Forza 5
+  7: "https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg", // Elden Ring
+  8: "https://cdn.cloudflare.steamstatic.com/steam/apps/1817070/header.jpg", // Spider Man
+  9: "https://cdn.cloudflare.steamstatic.com/steam/apps/1517290/header.jpg", // Battlefield
+  10: "https://cdn.cloudflare.steamstatic.com/steam/apps/2338770/header.jpg", // NBA
+
+  11: "https://cdn.cloudflare.steamstatic.com/steam/apps/2208920/header.jpg",
+  12: "https://cdn.cloudflare.steamstatic.com/steam/apps/1222680/header.jpg",
+  13: "https://cdn.cloudflare.steamstatic.com/steam/apps/2050650/header.jpg",
+  14: "https://cdn.cloudflare.steamstatic.com/steam/apps/2369390/header.jpg",
+  15: "https://cdn.cloudflare.steamstatic.com/steam/apps/990080/header.jpg",
+  16: "https://cdn.cloudflare.steamstatic.com/steam/apps/1593500/header.jpg",
+  17: "https://cdn.cloudflare.steamstatic.com/steam/apps/1971870/header.jpg",
+  18: "https://cdn.cloudflare.steamstatic.com/steam/apps/578080/header.jpg",
+  19: "https://cdn.cloudflare.steamstatic.com/steam/apps/1172470/header.jpg",
+  20: "https://cdn.cloudflare.steamstatic.com/steam/apps/1172470/header.jpg",
+
+  21: "https://cdn.cloudflare.steamstatic.com/steam/apps/1091500/header.jpg",
+  22: "https://cdn.cloudflare.steamstatic.com/steam/apps/782330/header.jpg",
+  23: "https://cdn.cloudflare.steamstatic.com/steam/apps/1659040/header.jpg",
+  24: "https://cdn.cloudflare.steamstatic.com/steam/apps/870780/header.jpg",
+  25: "https://cdn.cloudflare.steamstatic.com/steam/apps/1190460/header.jpg",
+  26: "https://cdn.cloudflare.steamstatic.com/steam/apps/1259420/header.jpg",
+  27: "https://cdn.cloudflare.steamstatic.com/steam/apps/1151640/header.jpg",
+  28: "https://cdn.cloudflare.steamstatic.com/steam/apps/990080/header.jpg",
+  29: "https://cdn.cloudflare.steamstatic.com/steam/apps/296100/header.jpg",
+  30: "https://cdn.cloudflare.steamstatic.com/steam/apps/2108330/header.jpg",
+
+  31: "https://cdn.cloudflare.steamstatic.com/steam/apps/1038250/header.jpg",
+  32: "https://cdn.cloudflare.steamstatic.com/steam/apps/2239550/header.jpg",
+  33: "https://cdn.cloudflare.steamstatic.com/steam/apps/2221490/header.jpg",
+  34: "https://cdn.cloudflare.steamstatic.com/steam/apps/990080/header.jpg",
+  35: "https://cdn.cloudflare.steamstatic.com/steam/apps/814380/header.jpg",
+  36: "https://cdn.cloudflare.steamstatic.com/steam/apps/374320/header.jpg",
+  37: "https://cdn.cloudflare.steamstatic.com/steam/apps/1018010/header.jpg",
+  38: "https://cdn.cloudflare.steamstatic.com/steam/apps/1325200/header.jpg",
+  39: "https://cdn.cloudflare.steamstatic.com/steam/apps/582010/header.jpg",
+  40: "https://cdn.cloudflare.steamstatic.com/steam/apps/1222690/header.jpg",
+
+  41: "https://cdn.cloudflare.steamstatic.com/steam/apps/1328670/header.jpg",
+  42: "https://cdn.cloudflare.steamstatic.com/steam/apps/72850/header.jpg",
+  43: "https://cdn.cloudflare.steamstatic.com/steam/apps/275850/header.jpg",
+  44: "https://cdn.cloudflare.steamstatic.com/steam/apps/1672970/header.jpg",
+  45: "https://cdn.cloudflare.steamstatic.com/steam/apps/105600/header.jpg",
+  46: "https://cdn.cloudflare.steamstatic.com/steam/apps/945360/header.jpg",
+  47: "https://cdn.cloudflare.steamstatic.com/steam/apps/1172470/header.jpg",
+  48: "https://cdn.cloudflare.steamstatic.com/steam/apps/1172470/header.jpg",
+  49: "https://cdn.cloudflare.steamstatic.com/steam/apps/2357570/header.jpg",
+  50: "https://cdn.cloudflare.steamstatic.com/steam/apps/252950/header.jpg"
+};
+// Game metadata enrichment
+const GAME_META = {
+  default: {
+    genres: ['action','rpg','strategy','sports'],
+    ratings: [4.2, 4.5, 4.7, 3.9, 4.8, 4.1, 4.6, 3.8, 4.3, 4.9],
+    platforms: ['PC','PS5','Xbox','PC, PS5','PC, Xbox','All Platforms'],
+    players: ['Single Player','Multiplayer','Co-op','Online Multiplayer'],
+    descriptions: [
+      'An epic adventure through a world on the brink of collapse. Master powerful abilities and forge your destiny.',
+      'Command your forces across dynamic battlefields. Strategy meets action in this intense tactical experience.',
+      'Explore vast open worlds, engage in deep storylines and become the legend you were born to be.',
+      'Fast-paced competitive gameplay with stunning visuals and an ever-evolving meta.',
+      'Build, survive, and conquer in this massive sandbox universe with infinite possibilities.',
+    ],
+    thumbIcons: ['⚔️','🎮','🔮','🏆','🌌','🎯','🛡️','🔥','🌍','🚀']
+  }
+};
+ 
+function getGenreClass(genre) {
+  const map = { action:'genre-action', rpg:'genre-rpg', strategy:'genre-strategy', sports:'genre-sports' };
+  return map[genre?.toLowerCase().trim()] || 'genre-default';
+}
+ 
+function getThumbClass(genre) {
+  const map = { action:'thumb-action', rpg:'thumb-rpg', strategy:'thumb-strategy', sports:'thumb-sports' };
+  return map[genre?.toLowerCase().trim()] || 'thumb-default';
+}
+ 
+function getGenre(game) {
+  if (game.genre) return game.genre;
+  const g = GAME_META.default.genres;
+  return g[game.id % g.length];
+}
+ 
+function getRating(game) {
+  if (game.rating) return game.rating;
+  const r = GAME_META.default.ratings;
+  return r[game.id % r.length];
+}
+ 
+function getPlatform(game) {
+  if (game.platform) return game.platform;
+  const p = GAME_META.default.platforms;
+  return p[game.id % p.length];
+}
+ 
+function getPlayers(game) {
+  if (game.players) return game.players;
+  const p = GAME_META.default.players;
+  return p[game.id % p.length];
+}
+ 
+function getDescription(game) {
+  if (game.description) return game.description;
+  const d = GAME_META.default.descriptions;
+  return d[game.id % d.length];
+}
+ 
+function getThumbIcon(game) {
+  const icons = GAME_META.default.thumbIcons;
+  return icons[game.id % icons.length];
+}
+ 
+function renderStars(rating) {
+  const full = Math.floor(rating);
+  const half = rating % 1 >= 0.5 ? 1 : 0;
+  let stars = '★'.repeat(full) + (half ? '⯨' : '') + '☆'.repeat(5 - full - half);
+  return stars;
+}
+ 
+function formatPrice(price) {
+  if (price === 0 || price === '0' || price === 'Free' || price === 'free') return null;
+  const num = parseFloat(price);
+  if (isNaN(num)) return price;
+  return num.toFixed(2);
+}
+ 
+// State
+let allGames = [];
+let filteredGames = [];
+let cart = {};
+let activeGenre = 'all';
+let activeSort = 'default';
+ 
+// Fetch games
+async function loadGames() {
+  try {
+    const res = await fetch(`${API_BASE}/games`);
+    if (!res.ok) throw new Error('Server error');
+    const data = await res.json();
+    allGames = data;
+    filteredGames = [...allGames];
+    renderGames();
+    hideLoader();
+  } catch (err) {
+    hideLoader();
+    showError(err.message);
+  }
+}
+ 
+function hideLoader() {
+  const loader = document.getElementById('loader');
+  loader.classList.add('hidden');
+  setTimeout(() => loader.remove(), 600);
+}
+ 
+function showError(msg) {
+  document.getElementById('games-grid').innerHTML = `
+    <div class="error-state" style="grid-column:1/-1">
+      <h2>CONNECTION FAILED</h2>
+      <p>Unable to reach the game server.<br>Make sure your Flask API is running at <code>${API_BASE}</code></p>
+      <p style="margin-top:8px;font-size:12px;color:#ff6699">${msg}</p>
+      <button class="retry-btn" onclick="location.reload()">↺ RETRY</button>
+    </div>
+  `;
+  document.getElementById('game-count').textContent = 'Error';
+}
+ 
+function renderGames() {
+  const grid = document.getElementById('games-grid');
+  const count = document.getElementById('game-count');
+ 
+  if (!filteredGames.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:80px 0;color:var(--muted);font-size:13px;letter-spacing:3px;text-transform:uppercase">No games found</div>`;
+    count.textContent = '0 titles';
+    return;
+  }
+ 
+  count.textContent = `${filteredGames.length} title${filteredGames.length !== 1 ? 's' : ''}`;
+ 
+  grid.innerHTML = filteredGames.map((game, i) => {
+    const genre = getGenre(game);
+    const rating = getRating(game);
+    const platform = getPlatform(game);
+    const players = getPlayers(game);
+    const desc = getDescription(game);
+    const icon = getThumbIcon(game);
+    const price = formatPrice(game.price);
+    const genreClass = getGenreClass(genre);
+    const thumbClass = getThumbClass(genre);
+    const cartItem = cart[game.id];
+ 
+    const priceHTML = price === null
+      ? `<span class="price-free">FREE</span>`
+      : `<div class="price"><span class="currency">$</span>${price}</div>`;
+ 
+    const imgSrc = game.image || GAME_IMAGES[game.id] || '';
+ 
+    const thumbHTML = imgSrc
+        ? `<img class="game-thumb" src="${imgSrc}" alt="${game.name}"
+            onerror="this.outerHTML = \`<div class='thumb-placeholder ${thumbClass}'>${icon}</div>\`">`
+        : `<div class="thumb-placeholder ${thumbClass}">${icon}</div>`;
+    return `
+      <div class="game-card" style="animation-delay:${i * 0.04}s">
+        <div class="card-glow"></div>
+        ${thumbHTML}
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="genre-tag ${genreClass}">${genre.toUpperCase()}</span>
+            <div class="rating">
+              <span>${renderStars(rating)}</span>
+              <span style="color:var(--gold);font-family:'Inter',sans-serif;font-size:11px;">${rating}</span>
+            </div>
+          </div>
+          <div class="card-title">${game.name}</div>
+          <div class="card-desc">${desc}</div>
+          <div class="card-specs">
+            <div class="spec"><span class="spec-icon">🎮</span><span>${platform}</span></div>
+            <div class="spec"><span class="spec-icon">👥</span><span>${players}</span></div>
+          </div>
+          <div class="card-footer">
+            <div class="price-wrap">${priceHTML}</div>
+            <button class="buy-btn" onclick="addToCart(${game.id})" id="buy-${game.id}">
+              <span>${cartItem ? `IN CART (${cartItem.qty})` : 'ADD TO CART'}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+ 
+// Cart
+function addToCart(gameId) {
+  const game = allGames.find(g => g.id === gameId);
+  if (!game) return;
+ 
+  if (!cart[gameId]) {
+    cart[gameId] = { game, qty: 0 };
+  }
+  cart[gameId].qty++;
+ 
+  updateCartCount();
+  renderGames();
+  showToast(`${game.name} added to cart`, false);
+}
+ 
+function removeFromCart(gameId) {
+  delete cart[gameId];
+  updateCartCount();
+  renderCart();
+  renderGames();
+}
+ 
+function changeQty(gameId, delta) {
+  if (!cart[gameId]) return;
+  cart[gameId].qty += delta;
+  if (cart[gameId].qty <= 0) {
+    removeFromCart(gameId);
+    return;
+  }
+  renderCart();
+  renderGames();
+  updateCartCount();
+}
+ 
+function updateCartCount() {
+  const total = Object.values(cart).reduce((s, i) => s + i.qty, 0);
+  document.getElementById('cart-count').textContent = total;
+}
+ 
+function toggleCart() {
+  const panel = document.getElementById('cart-panel');
+  const overlay = document.getElementById('overlay');
+  panel.classList.toggle('open');
+  overlay.classList.toggle('show');
+  if (panel.classList.contains('open')) renderCart();
+}
+ 
+function closeCart() {
+  document.getElementById('cart-panel').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
+ 
+function renderCart() {
+  const items = Object.values(cart);
+  const container = document.getElementById('cart-items');
+  const totalEl = document.getElementById('cart-total');
+ 
+  if (!items.length) {
+    container.innerHTML = `
+      <div class="cart-empty">
+        <div class="cart-empty-icon">⬡</div>
+        <p>Your cart is empty</p>
+      </div>`;
+    totalEl.textContent = '$0.00';
+    return;
+  }
+ 
+  let total = 0;
+  container.innerHTML = items.map(({ game, qty }) => {
+    const price = formatPrice(game.price);
+    const lineTotal = price ? parseFloat(price) * qty : 0;
+    total += lineTotal;
+    const genre = getGenre(game);
+    const thumbClass = getThumbClass(genre);
+    const icon = getThumbIcon(game);
+    const imgSrc = game.image || GAME_IMAGES[game.id] || '';
+ 
+    const imgHTML = imgSrc
+        ? `<img class="cart-item-img" src="${imgSrc}" alt="${game.name}"
+            onerror="this.outerHTML = \`<div class='cart-item-img-placeholder ${thumbClass}'>${icon}</div>\`">`
+        : `<div class="cart-item-img-placeholder ${thumbClass}">${icon}</div>`;
+    return `
+      <div class="cart-item">
+        ${imgHTML}
+        <div class="cart-item-info">
+          <div class="cart-item-name">${game.name}</div>
+          <div class="cart-item-price">${price ? `$${price}` : 'FREE'}</div>
+          <div class="cart-item-qty">
+            <button class="qty-btn" onclick="changeQty(${game.id}, -1)">−</button>
+            <span class="qty-num">${qty}</span>
+            <button class="qty-btn" onclick="changeQty(${game.id}, 1)">+</button>
+          </div>
+        </div>
+        <button class="remove-item" onclick="removeFromCart(${game.id})">✕</button>
+      </div>
+    `;
+  }).join('');
+ 
+  totalEl.textContent = `$${total.toFixed(2)}`;
+}
+ 
+// Buy via API
+async function handleCheckout() {
+  const items = Object.values(cart);
+  if (!items.length) {
+    showToast('Your cart is empty!', true);
+    return;
+  }
+ 
+  const btn = document.querySelector('.checkout-btn');
+  btn.textContent = 'PROCESSING...';
+  btn.disabled = true;
+ 
+  try {
+    const payload = {
+      items: items.map(({ game, qty }) => ({ game_id: game.id, quantity: qty }))
+    };
+
+    const res = await fetch(`${API_BASE}/buy`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.message || 'Failed to complete purchase');
+    }
+
+    cart = {};
+    updateCartCount();
+    renderCart();
+    renderGames();
+    closeCart();
+    showToast(`Purchase successful! (Order ID: #${data.order_id}) 🎮`, false);
+  } catch (err) {
+    showToast(err.message || 'Transaction failed. Try again.', true);
+  } finally {
+    btn.textContent = 'PROCEED TO CHECKOUT';
+    btn.disabled = false;
+  }
+}
+ 
+// Filter & Sort
+function filterByGenre(genre, btn) {
+  activeGenre = genre;
+  document.querySelectorAll('nav button:not(.cart-btn)').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  applyFilters();
+}
+ 
+function handleSearch() {
+  applyFilters();
+}
+ 
+function sortGames(mode, btn) {
+  activeSort = mode;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+ 
+function applyFilters() {
+  const query = document.getElementById('search-input').value.toLowerCase().trim();
+  let games = [...allGames];
+ 
+  if (activeGenre !== 'all') {
+    games = games.filter(g => getGenre(g).toLowerCase().trim() === activeGenre);
+  }
+ 
+  if (query) {
+    games = games.filter(g => g.name.toLowerCase().includes(query) || getDescription(g).toLowerCase().includes(query));
+  }
+ 
+  if (activeSort === 'price-asc') {
+    games.sort((a, b) => (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0));
+  } else if (activeSort === 'price-desc') {
+    games.sort((a, b) => (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0));
+  } else if (activeSort === 'rating') {
+    games.sort((a, b) => getRating(b) - getRating(a));
+  }
+ 
+  filteredGames = games;
+  renderGames();
+}
+ 
+// Toast
+let toastTimer;
+function showToast(msg, isError) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  document.getElementById('toast-icon').textContent = isError ? '!' : '✓';
+  toast.className = 'toast' + (isError ? ' error' : ' success');
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// My Orders Functions
+function openMyOrdersModal() {
+  document.getElementById('my-orders-modal').classList.add('show');
+  fetchMyOrders();
+}
+
+function closeMyOrdersModal() {
+  document.getElementById('my-orders-modal').classList.remove('show');
+}
+
+let currentOrdersData = []; // لحفظ البيانات مؤقتاً لتسهيل عملية الطباعة
+
+async function fetchMyOrders() {
+  const content = document.getElementById('my-orders-content');
+  content.innerHTML = '<p style="text-align:center; color:var(--muted);">Loading your orders...</p>';
+  try {
+    const res = await fetch(`${API_BASE}/orders`, { cache: 'no-store' }); // منع الكاش لضمان جلب البيانات الجديدة دائماً
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Failed to load orders');
+    currentOrdersData = data;
+    
+    if (data.length === 0) {
+      content.innerHTML = '<p style="text-align:center; color:var(--muted);">No orders found.</p>';
+      return;
+    }
+
+    let html = `<div style="margin-bottom: 15px; font-weight: 700; color: var(--muted); font-size: 12px; letter-spacing: 1px;">TOTAL ORDERS FOUND: ${data.length}</div>`;
+    data.forEach(order => {
+      html += `<div style="background: white; border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">`;
+      html += `
+        <div style="margin-bottom: 12px; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <span class="genre-tag genre-strategy">ORDER #${order.order_id}</span>
+            <span style="font-size: 11px; color: var(--muted); margin-left: 8px;">${order.order_date || ''}</span>
+          </div>
+          <button onclick="printOrder(${order.order_id})" style="background:transparent; border:none; color:var(--primary); cursor:pointer; font-family:'Rajdhani', sans-serif; font-size:12px; font-weight:700;"><span style="font-size:14px;">🖨️</span> PRINT RECEIPT</button>
+        </div>`;
+      if (order.items.length === 0) {
+        html += `<div style="padding: 8px 0; color: var(--secondary); font-size: 12px; font-weight: 600;">(Legacy Order - Details unavailable)</div>`;
+      } else {
+        order.items.forEach(item => {
+          html += `
+            <div class="order-item-row" style="padding: 8px 0;">
+              <div><span style="color:var(--primary);font-weight:700;">${item.quantity}x</span> ${item.name} <span style="color:var(--muted);font-size:11px;margin-left:6px;">($${item.price.toFixed(2)}/unit)</span></div>
+              <div style="font-family:'Orbitron', monospace;">$${(item.price * item.quantity).toFixed(2)}</div>
+            </div>
+          `;
+        });
+      }
+      html += `<div class="order-summary" style="margin-top: 12px; padding-top: 12px;"><span>TOTAL</span><span style="color: var(--primary)">$${order.total_price.toFixed(2)}</span></div></div>`;
+    });
+    
+    content.innerHTML = html;
+  } catch (err) {
+    content.innerHTML = `<p style="color: var(--danger); text-align: center;">${err.message}</p>`;
+  }
+}
+ 
+// Init
+loadGames();
+</script>
+</body>
+</html>
