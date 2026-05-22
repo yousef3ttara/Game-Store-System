@@ -16,10 +16,11 @@ This project solves these issues by providing an automated, centralized full-sta
 
 ### Objectives
 - Develop a user-friendly frontend for browsing games and placing orders.
+- Implement secure user authentication with session management.
 - Create a RESTful API to bridge the frontend and the database efficiently.
-- Design a normalized relational database to securely store games, categories, platforms, and order data.
+- Design a normalized relational database to securely store users, games, categories, platforms, and order data.
 - Automate stock management upon successful transactions.
-- Provide a clear view of transaction histories for administrative or user tracking.
+- Provide a clear view of transaction histories for administrative or individual user tracking.
 
 ## 3. System Architecture
 
@@ -43,13 +44,15 @@ The data layer utilizes **SQL Server**, a robust relational database management 
 ### Tables
 | Table | Columns |
 |-------|---------|
+| **Users** | `user_id`, `username`, `email`, `password_hash`, `created_at` |
 | **Games** | `game_id`, `name`, `price`, `stock_quantity`, `category_id`, `platform_id`, `release_date` |
 | **Categories** | `category_id`, `name` |
 | **Platforms** | `platform_id`, `name` |
-| **Orders** | `order_id`, `order_date`, `total_price` |
+| **Orders** | `order_id`, `user_id`, `order_date`, `total_price` |
 | **Order_Items** | `id`, `order_id`, `game_id`, `quantity`, `price` |
 
 ### Relationships Explanation
+- **Users to Orders (One-to-Many):** A single user can place multiple orders. The `user_id` in the `Orders` table acts as a foreign key linking back to the specific user in the `Users` table (can be NULL for guest checkouts).
 - **Games to Categories (Many-to-One):** Each game belongs to a specific category (e.g., Action, RPG). The `category_id` in the `Games` table is a foreign key referencing `category_id` in the `Categories` table.
 - **Games to Platforms (Many-to-One):** Each game is associated with a specific platform (e.g., PC, PlayStation). The `platform_id` in the `Games` table is a foreign key referencing `platform_id` in the `Platforms` table.
 - **Orders to Order_Items (One-to-Many):** A single order can contain multiple games. The `order_id` in the `Order_Items` table acts as a foreign key linking back to the specific order in the `Orders` table.
@@ -59,6 +62,7 @@ The data layer utilizes **SQL Server**, a robust relational database management 
 In the context of data analysis and star-schema design, the tables in this system can be categorized as follows:
 
 **Dimension Tables (Lookup Tables):**
+- **Users**: Stores user accounts, hashed credentials, and emails.
 - **Categories**: Stores descriptive attributes about the game genres.
 - **Platforms**: Stores descriptive attributes about the systems games run on.
 - **Games**: Acts as a product dimension, containing descriptive and qualitative data (name, release_date) about the items sold.
@@ -70,6 +74,18 @@ In the context of data analysis and star-schema design, the tables in this syste
 ## 5. API Documentation
 
 ### Endpoints
+
+#### `POST /register`
+- **Description**: Registers a new user with a username, email, and password, hashing the password using SHA-256 and initiating a session.
+
+#### `POST /login`
+- **Description**: Authenticates a user with a username or email and password, starting a secure session.
+
+#### `POST /logout`
+- **Description**: Clears the current user's active session.
+
+#### `GET /me`
+- **Description**: Retrieves session data for the currently logged-in user.
 
 #### `GET /games`
 - **Description**: Retrieves a list of all available games in the store.
@@ -116,7 +132,7 @@ In the context of data analysis and star-schema design, the tables in this syste
   ```
 
 #### `GET /orders`
-- **Description**: Retrieves a complete list of past orders including their total prices and dates.
+- **Description**: Retrieves a complete list of past orders including their total prices and dates for all users.
 - **Request Parameters**: None
 - **Response Example**:
   ```json
@@ -129,12 +145,16 @@ In the context of data analysis and star-schema design, the tables in this syste
   ]
   ```
 
+#### `GET /my-orders`
+- **Description**: Retrieves a list of past orders specific to the currently logged-in user session.
+
 ## 6. Features
+- **User Authentication**: Secure registration and login functionalities using session management and password hashing.
 - **Browse Games**: Users can view a complete catalog of available games including their prices, platforms, and current stock.
 - **Shopping Cart**: Users can select games and add them to a virtual cart before purchasing.
-- **Checkout Processing**: Secure calculation of total prices and generation of order records.
+- **Checkout Processing**: Secure calculation of total prices and generation of order records linked to the authenticated user.
 - **Automated Inventory Management**: The system automatically subtracts the purchased quantity from the `stock_quantity` of a game once an order is placed.
-- **Order History**: Users/Administrators can view a comprehensive list of all historical orders.
+- **Order History**: Users can securely view their personal order history, while administrators can track all historical orders.
 
 ## 7. Technologies Used
 - **Frontend**: HTML5, CSS3, Vanilla JavaScript
@@ -143,7 +163,6 @@ In the context of data analysis and star-schema design, the tables in this syste
 - **Data Exchange**: JSON, RESTful architecture
 
 ## 8. Future Improvements
-- **User Authentication**: Implement user registration and login functionality to track individual user orders.
 - **Admin Dashboard**: Create a dedicated interface for store owners to add, update, or remove games and categories.
 - **Payment Gateway Integration**: Integrate third-party payment processors like Stripe or PayPal for real transactions.
 - **Advanced Filtering and Search**: Add capabilities to search for games by name or filter by specific categories, platforms, or price ranges.
@@ -151,8 +170,9 @@ In the context of data analysis and star-schema design, the tables in this syste
 
 ## 9. How to Run the Project
 1. **Database Setup**:
-   - Install Microsoft SQL Server.
-   - Execute the provided SQL scripts to create the database schema and populate it with initial seed data (Games, Categories, Platforms).
+   - Install Microsoft SQL Server and SQL Server Management Studio (SSMS).
+   - Execute the `setup_nexusdb.sql` script in SSMS (Press F5) to create the database (`NexusDB`), the required tables (including Users and Orders), and to insert initial seed data (Games, Categories, Platforms).
+   - Alternatively, you can run `bulk_insert_games.sql` or use SSMS Import Wizard to import games directly from `data.csv`.
 2. **Backend Setup**:
    - Ensure Python 3.x is installed.
    - Navigate to the backend directory and create a virtual environment: `python -m venv venv`

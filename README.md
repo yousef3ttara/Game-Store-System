@@ -14,10 +14,11 @@
 The **Game Store System** is a comprehensive full-stack web application designed to simulate a digital video game storefront. It provides a seamless and interactive interface for users to browse a catalog of games, manage their shopping carts, and securely complete purchases. The system features an automated inventory management backend that dynamically updates stock quantities upon successful transactions, ensuring data consistency and accuracy.
 
 ## ✨ Core Features
+* **User Authentication:** Secure registration and login system with session management and SHA-256 password hashing.
 * **Dynamic Game Catalog:** Browse available games, viewing real-time details such as price, genre, platform, available stock, and release date.
 * **Interactive Shopping Cart:** A smooth cart management system allowing users to adjust quantities and calculate total prices before checkout.
 * **Automated Inventory Management:** Once an order is successfully placed, the backend automatically deducts the purchased quantities from the database, preventing overselling.
-* **Order History Tracking:** A dedicated dashboard to retrieve and view comprehensive records of all past orders, including transaction dates and line-item details.
+* **Order History Tracking:** Users can view their personal order history, while administrators can track all past orders, including transaction dates and line-item details.
 * **Asynchronous Operations:** The frontend utilizes AJAX/Fetch requests to communicate with the RESTful API, providing a fast, single-page-like experience without full page reloads.
 
 ## 🛠️ Technologies Used
@@ -30,27 +31,33 @@ The **Game Store System** is a comprehensive full-stack web application designed
 The database is highly optimized and normalized, utilizing Data Warehousing concepts to separate descriptive details from transactional records:
 
 **Dimension Tables (Lookup Tables):**
+- `Users`: Stores user accounts, credentials (hashed), and emails.
 - `Categories`: Descriptive attributes about game genres.
 - `Platforms`: Descriptive attributes about gaming systems.
 - `Games`: The product dimension, containing details like name, price, and release date.
 
 **Fact Tables (Transaction Tables):**
-- `Orders`: Records the occurrence of a purchase event (Total Price, Date).
+- `Orders`: Records the occurrence of a purchase event (Total Price, Date, User ID).
 - `Order_Items`: Granular line-item metrics (quantity, price) linked to specific games and orders.
 
 ## 🔌 API Endpoints
 | Method | Endpoint | Description |
 |--------|----------|-------------|
+| `POST` | `/register` | Registers a new user and starts a session. |
+| `POST` | `/login` | Authenticates a user and starts a session. |
+| `POST` | `/logout` | Clears the current user session. |
+| `GET`  | `/me` | Retrieves information about the currently logged-in user. |
 | `GET`  | `/games` | Retrieves a list of all available games in the store. |
-| `POST` | `/buy`   | Processes a purchase, updates inventory, and creates an order record. |
-| `GET`  | `/orders`| Retrieves a complete list of past orders and their line-item details. |
+| `POST` | `/buy`   | Processes a purchase, updates inventory, and creates an order record linked to the user. |
+| `GET`  | `/orders`| Retrieves a complete list of all past orders. |
+| `GET`  | `/my-orders`| Retrieves a list of past orders specific to the logged-in user. |
 
 ## 🚀 How to Run the Project
 
 ### 1. Database Setup
 1. Install Microsoft SQL Server and SQL Server Management Studio (SSMS).
-2. Execute the SQL script provided in `database_source.sql` to create the database schema (`ProjectDB`) and its tables.
-3. Insert your initial seed data into the `Categories`, `Platforms`, and `Games` tables.
+2. Open `setup_nexusdb.sql` in SSMS and execute it (Press F5) to create the database schema (`NexusDB`), tables, and seed the initial data.
+3. (Optional) To import games directly from the CSV file, you can run `bulk_insert_games.sql` instead of the manual inserts, or use the SSMS Import Flat File Wizard on `data.csv`.
 
 ### 2. Backend Setup
 1. Ensure **Python 3.x** is installed on your system.
@@ -67,7 +74,7 @@ The database is highly optimized and normalized, utilizing Data Warehousing conc
 5. Open `app.py` and update the database connection string to match your local SQL Server credentials (Server Name):
    ```python
    conn = pyodbc.connect(
-       "DRIVER={SQL Server};SERVER=YOUR_SERVER_NAME;DATABASE=ProjectDB;Trusted_Connection=yes;"
+       "DRIVER={SQL Server};SERVER=YOUR_SERVER_NAME;DATABASE=NexusDB;Trusted_Connection=yes;"
    )
    ```
 6. Start the Flask server:

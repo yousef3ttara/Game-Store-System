@@ -877,10 +877,230 @@
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: #ced4da; border-radius: 3px; }
   ::-webkit-scrollbar-thumb:hover { background: #adb5bd; }
+
+  /* ============================================================
+     AUTH MODAL
+  ============================================================ */
+  .auth-modal {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(6px);
+    z-index: 900;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .auth-modal.show { opacity: 1; pointer-events: all; }
+
+  .auth-box {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    width: 90%; max-width: 420px;
+    overflow: hidden;
+    transform: translateY(24px);
+    transition: transform 0.35s cubic-bezier(.25,.46,.45,.94);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  }
+  .auth-modal.show .auth-box { transform: translateY(0); }
+
+  .auth-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+  }
+  .auth-tab {
+    flex: 1;
+    padding: 16px;
+    background: transparent;
+    border: none;
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all 0.3s;
+    border-bottom: 2px solid transparent;
+  }
+  .auth-tab.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+    background: rgba(0,123,255,0.04);
+  }
+
+  .auth-body { padding: 28px; }
+
+  .auth-panel { display: none; }
+  .auth-panel.active { display: block; }
+
+  .auth-field {
+    margin-bottom: 16px;
+  }
+  .auth-field label {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+    font-family: 'Inter', sans-serif;
+  }
+  .auth-field input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    background: #fafafa;
+  }
+  .auth-field input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+    background: white;
+  }
+
+  .auth-submit {
+    width: 100%;
+    padding: 14px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 0.3s, transform 0.2s;
+    margin-top: 4px;
+  }
+  .auth-submit:hover { opacity: 0.88; transform: translateY(-1px); }
+  .auth-submit:active { transform: translateY(0); }
+  .auth-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .auth-error {
+    background: #fff5f5;
+    border: 1px solid #ffcccc;
+    color: var(--danger);
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-bottom: 14px;
+    display: none;
+    font-family: 'Inter', sans-serif;
+  }
+  .auth-error.show { display: block; }
+
+  .auth-close {
+    position: absolute;
+    top: 16px; right: 20px;
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: color 0.3s;
+    line-height: 1;
+  }
+  .auth-close:hover { color: var(--danger); }
+
+  /* User chip in nav */
+  .user-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,123,255,0.08);
+    border: 1px solid rgba(0,123,255,0.2);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary);
+    cursor: default;
+  }
+  .user-chip-avatar {
+    width: 26px; height: 26px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .logout-btn {
+    background: transparent;
+    border: 1px solid #dee2e6;
+    color: var(--muted);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.3s;
+  }
+  .logout-btn:hover { border-color: var(--danger); color: var(--danger); background: rgba(220,53,69,0.05); }
 </style>
 </head>
 <body>
  
+<!-- ============================================================
+     AUTH MODAL
+============================================================ -->
+<div class="auth-modal" id="auth-modal">
+  <div class="auth-box" style="position:relative;">
+    <button class="auth-close" onclick="closeAuthModal()">✕</button>
+    <!-- Tabs -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login"  onclick="switchTab('login')">Login</button>
+      <button class="auth-tab"        id="tab-register" onclick="switchTab('register')">Register</button>
+    </div>
+    <div class="auth-body">
+
+      <!-- LOGIN PANEL -->
+      <div class="auth-panel active" id="panel-login">
+        <div class="auth-error" id="login-error"></div>
+        <div class="auth-field">
+          <label>Username or Email</label>
+          <input type="text" id="login-identifier" placeholder="your username or email" autocomplete="username" />
+        </div>
+        <div class="auth-field">
+          <label>Password</label>
+          <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" />
+        </div>
+        <button class="auth-submit" id="login-btn" onclick="doLogin()">Sign In</button>
+      </div>
+
+      <!-- REGISTER PANEL -->
+      <div class="auth-panel" id="panel-register">
+        <div class="auth-error" id="register-error"></div>
+        <div class="auth-field">
+          <label>Username</label>
+          <input type="text" id="reg-username" placeholder="choose a username" autocomplete="username" />
+        </div>
+        <div class="auth-field">
+          <label>Email</label>
+          <input type="email" id="reg-email" placeholder="your@email.com" autocomplete="email" />
+        </div>
+        <div class="auth-field">
+          <label>Password</label>
+          <input type="password" id="reg-password" placeholder="min 6 characters" autocomplete="new-password" />
+        </div>
+        <button class="auth-submit" id="register-btn" onclick="doRegister()">Create Account</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <!-- Loading Screen -->
 <div class="loading-screen" id="loader">
   <div class="loader-logo">NEXUS</div>
@@ -909,6 +1129,8 @@
     <button onclick="filterByGenre('rpg', this)">RPG</button>
     <button onclick="filterByGenre('strategy', this)">Strategy</button>
     <button onclick="openMyOrdersModal()">My Orders</button>
+    <!-- Auth UI — يتحكم فيها JS -->
+    <div id="auth-nav"></div>
     <button class="cart-btn" onclick="toggleCart()">
       Cart
       <div class="cart-count" id="cart-count">0</div>
@@ -1472,7 +1694,229 @@ async function fetchMyOrders() {
   }
 }
  
+// ============================================================
+// 🔑 AUTH
+// ============================================================
+
+let currentUser = null;
+
+// فحص الجلسة عند تحميل الصفحة
+async function checkSession() {
+  try {
+    const res  = await fetch(`${API_BASE}/me`, { credentials: 'include' });
+    const data = await res.json();
+    if (data.logged_in) {
+      currentUser = data;
+      renderAuthNav();
+    } else {
+      currentUser = null;
+      renderAuthNav();
+    }
+  } catch (_) {
+    renderAuthNav();
+  }
+}
+
+function renderAuthNav() {
+  const nav = document.getElementById('auth-nav');
+  if (currentUser) {
+    const initial = currentUser.username.charAt(0).toUpperCase();
+    nav.innerHTML = `
+      <div class="user-chip">
+        <div class="user-chip-avatar">${initial}</div>
+        ${currentUser.username}
+      </div>
+      <button class="logout-btn" onclick="doLogout()">Logout</button>
+    `;
+  } else {
+    nav.innerHTML = `
+      <button onclick="openAuthModal('login')" style="background:transparent;border:1px solid var(--border);color:var(--muted);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;padding:8px 18px;cursor:pointer;border-radius:6px;transition:all 0.3s;"
+        onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'"
+        onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">Login</button>
+      <button onclick="openAuthModal('register')" style="background:var(--primary);border:1px solid var(--primary);color:white;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;padding:8px 18px;cursor:pointer;border-radius:6px;transition:opacity 0.3s;"
+        onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">Register</button>
+    `;
+  }
+}
+
+function openAuthModal(tab = 'login') {
+  document.getElementById('auth-modal').classList.add('show');
+  switchTab(tab);
+  // clear fields
+  ['login-identifier','login-password','reg-username','reg-email','reg-password']
+    .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  hideAuthErrors();
+}
+
+function closeAuthModal() {
+  document.getElementById('auth-modal').classList.remove('show');
+}
+
+function switchTab(tab) {
+  ['login','register'].forEach(t => {
+    document.getElementById(`tab-${t}`).classList.toggle('active', t === tab);
+    document.getElementById(`panel-${t}`).classList.toggle('active', t === tab);
+  });
+  hideAuthErrors();
+}
+
+function hideAuthErrors() {
+  document.querySelectorAll('.auth-error').forEach(el => el.classList.remove('show'));
+}
+
+function showAuthError(panelId, msg) {
+  const el = document.getElementById(panelId);
+  el.textContent = msg;
+  el.classList.add('show');
+}
+
+async function doLogin() {
+  const identifier = document.getElementById('login-identifier').value.trim();
+  const password   = document.getElementById('login-password').value;
+  const btn        = document.getElementById('login-btn');
+
+  if (!identifier || !password) {
+    showAuthError('login-error', 'Please fill in all fields.');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Signing in...';
+  hideAuthErrors();
+
+  try {
+    const res  = await fetch(`${API_BASE}/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ identifier, password })
+    });
+    const data = await res.json();
+    if (!res.ok) { showAuthError('login-error', data.message); return; }
+
+    currentUser = data;
+    renderAuthNav();
+    closeAuthModal();
+    showToast(`Welcome back, ${data.username}! 🎮`, false);
+  } catch (_) {
+    showAuthError('login-error', 'Connection error. Is the server running?');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Sign In';
+  }
+}
+
+async function doRegister() {
+  const username = document.getElementById('reg-username').value.trim();
+  const email    = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value;
+  const btn      = document.getElementById('register-btn');
+
+  if (!username || !email || !password) {
+    showAuthError('register-error', 'Please fill in all fields.');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Creating account...';
+  hideAuthErrors();
+
+  try {
+    const res  = await fetch(`${API_BASE}/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ username, email, password })
+    });
+    const data = await res.json();
+    if (!res.ok) { showAuthError('register-error', data.message); return; }
+
+    currentUser = data;
+    renderAuthNav();
+    closeAuthModal();
+    showToast(`Account created! Welcome, ${data.username}! 🎉`, false);
+  } catch (_) {
+    showAuthError('register-error', 'Connection error. Is the server running?');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Create Account';
+  }
+}
+
+async function doLogout() {
+  try {
+    await fetch(`${API_BASE}/logout`, { method: 'POST', credentials: 'include' });
+  } catch (_) {}
+  currentUser = null;
+  renderAuthNav();
+  showToast('Logged out successfully.', false);
+}
+
+// أضاف credentials: include للـ My Orders لإرسال الكوكيز
+async function fetchMyOrders() {
+  const content = document.getElementById('my-orders-content');
+  content.innerHTML = '<p style="text-align:center; color:var(--muted);">Loading your orders...</p>';
+  try {
+    const endpoint = currentUser ? `${API_BASE}/my-orders` : `${API_BASE}/orders`;
+    const res  = await fetch(endpoint, { cache: 'no-store', credentials: 'include' });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Failed to load orders');
+    currentOrdersData = data;
+    
+    if (data.length === 0) {
+      content.innerHTML = '<p style="text-align:center; color:var(--muted);">No orders found.</p>';
+      return;
+    }
+
+    let html = `<div style="margin-bottom: 15px; font-weight: 700; color: var(--muted); font-size: 12px; letter-spacing: 1px;">TOTAL ORDERS FOUND: ${data.length}</div>`;
+    data.forEach(order => {
+      html += `<div style="background: white; border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">` ;
+      html += `
+        <div style="margin-bottom: 12px; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <span class="genre-tag genre-strategy">ORDER #${order.order_id}</span>
+            <span style="font-size: 11px; color: var(--muted); margin-left: 8px;">${order.order_date || ''}</span>
+          </div>
+        </div>`;
+      if (order.items.length === 0) {
+        html += `<div style="padding: 8px 0; color: var(--secondary); font-size: 12px; font-weight: 600;">(Legacy Order - Details unavailable)</div>`;
+      } else {
+        order.items.forEach(item => {
+          html += `
+            <div class="order-item-row" style="padding: 8px 0;">
+              <div><span style="color:var(--primary);font-weight:700;">${item.quantity}x</span> ${item.name} <span style="color:var(--muted);font-size:11px;margin-left:6px;">($${item.price.toFixed(2)}/unit)</span></div>
+              <div style="font-family:'Orbitron', monospace;">$${(item.price * item.quantity).toFixed(2)}</div>
+            </div>
+          `;
+        });
+      }
+      html += `<div class="order-summary" style="margin-top: 12px; padding-top: 12px;"><span>TOTAL</span><span style="color: var(--primary)">$${order.total_price.toFixed(2)}</span></div></div>`;
+    });
+    
+    content.innerHTML = html;
+  } catch (err) {
+    content.innerHTML = `<p style="color: var(--danger); text-align: center;">${err.message}</p>`;
+  }
+}
+
+// close auth modal when clicking backdrop
+document.getElementById('auth-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeAuthModal();
+});
+
+// Enter key support in auth fields
+document.addEventListener('keydown', function(e) {
+  if (e.key !== 'Enter') return;
+  const modal = document.getElementById('auth-modal');
+  if (!modal.classList.contains('show')) return;
+  const activePanel = document.querySelector('.auth-panel.active');
+  if (!activePanel) return;
+  if (activePanel.id === 'panel-login') doLogin();
+  else doRegister();
+});
+
 // Init
+checkSession();
 loadGames();
 </script>
 </body>

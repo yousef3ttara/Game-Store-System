@@ -29,11 +29,24 @@ CREATE TABLE Games (
 );
 
 -- ==========================================
+-- USERS TABLE
+-- ==========================================
+
+CREATE TABLE Users (
+    user_id   INT IDENTITY(1,1) PRIMARY KEY,
+    username  NVARCHAR(100) NOT NULL UNIQUE,
+    email     NVARCHAR(200) NOT NULL UNIQUE,
+    password_hash NVARCHAR(256) NOT NULL,
+    created_at DATETIME DEFAULT GETDATE()
+);
+
+-- ==========================================
 -- FACT TABLES
 -- ==========================================
 
 CREATE TABLE Orders (
-    order_id INT IDENTITY(1,1) PRIMARY KEY,
+    order_id   INT IDENTITY(1,1) PRIMARY KEY,
+    user_id    INT FOREIGN KEY REFERENCES Users(user_id) NULL,
     order_date DATETIME DEFAULT GETDATE(),
     total_price DECIMAL(10, 2) NOT NULL
 );
@@ -41,7 +54,7 @@ CREATE TABLE Orders (
 CREATE TABLE Order_Items (
     id INT IDENTITY(1,1) PRIMARY KEY,
     order_id INT FOREIGN KEY REFERENCES Orders(order_id),
-    game_id INT FOREIGN KEY REFERENCES Games(game_id),
+    game_id  INT FOREIGN KEY REFERENCES Games(game_id),
     quantity INT NOT NULL,
-    price DECIMAL(10, 2) NOT NULL
+    price    DECIMAL(10, 2) NOT NULL
 );
